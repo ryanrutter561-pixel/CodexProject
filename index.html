@@ -50,6 +50,7 @@
 
   <nav class="tabs" role="tablist" aria-label="Sections">
     <button role="tab" data-tab="timeline">TIMELINE</button>
+    <button role="tab" data-tab="grand">GRAND THEORIES</button>
     <button role="tab" data-tab="minigames">MINIGAMES</button>
     <button role="tab" data-tab="theories">THEORIES</button>
     <button role="tab" data-tab="characters">CHARACTERS</button>
@@ -73,6 +74,20 @@
         <div class="tl-rail"><span class="tl-walker" id="tlWalker"></span></div>
       </div>
       <div id="timeline" class="timeline"></div>
+    </section>
+
+    <!-- GRAND THEORIES -->
+    <section class="tab" id="tab-grand" role="tabpanel" aria-label="Grand theories" hidden>
+      <div class="intro panel">
+        <p><b class="hl">GRAND THEORIES:</b> The big, complete readings of the series, each one a full timeline the fandom has rallied behind at some point. Pick one to read its condensed timeline and see what sets it apart, or load it into your canon. The <b>% MATCH</b> shows how close your current choices are to each one.</p>
+      </div>
+      <div id="grandPick" class="grand-pick"></div>
+      <div id="grandDetail" class="grand-detail"></div>
+      <div class="panel grand-cmp-panel">
+        <h2 class="h2">SIDE BY SIDE</h2>
+        <p class="muted" style="margin:0 0 10px">Where the grand theories split. <span class="cmp-key diff">Gold</span> marks a break from the mainstream Afton Saga, and <span class="cmp-key mine">✓</span> marks an answer that matches your canon.</p>
+        <div class="cmp-wrap"><table id="grandCmp" class="cmp"></table></div>
+      </div>
     </section>
 
     <!-- MINIGAMES -->
@@ -166,6 +181,7 @@
   <script src="js/sprites.js"></script>
   <script src="js/data.js"></script>
   <script src="js/minigames.js"></script>
+  <script src="js/grand.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

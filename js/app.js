@@ -628,8 +628,92 @@
     if (e.key === "ArrowLeft") { e.preventDefault(); $("#mgPrev").click(); }
   });
 
+  // ---------------- GRAND THEORIES (complete timelines) ----------------
+  const GRAND = window.LORE.GRAND || [];
+  const GRAND_COMPARE = window.LORE.GRAND_COMPARE || [];
+  let grandId = GRAND.length ? GRAND[0].id : null;
+  const grandState = (g) => ({ ...defaults(), ...(g.set || {}) });
+  const optLabel = (tid, oid) => { const o = TH[tid].options.find((x) => x.id === oid); return o ? o.label : oid; };
+  function grandMatch(g) {
+    const st = grandState(g);
+    const same = THEORIES.filter((t) => st[t.id] === S[t.id]).length;
+    return Math.round((same / THEORIES.length) * 100);
+  }
+  function renderGrand() {
+    if (!$("#grandPick") || !GRAND.length) return;
+    const g = GRAND.find((x) => x.id === grandId) || GRAND[0];
+    const best = GRAND.reduce((a, b) => (grandMatch(b) > grandMatch(a) ? b : a));
+    $("#grandPick").innerHTML = GRAND.map((x) => {
+      const pct = grandMatch(x);
+      return `<button class="grand-card" data-grand="${x.id}" aria-current="${x.id === g.id}">
+        ${SP.img(x.sprite, 48)}
+        <span class="grand-card-body">
+          <span class="grand-card-name">${esc(x.name)}</span>
+          <span class="tag t-${x.tag}">${x.tag}</span>
+          <span class="grand-meter" title="How closely your current canon matches"><span style="width:${pct}%"></span></span>
+          <span class="grand-pct">${pct}% MATCH${x.id === best.id ? " · CLOSEST" : ""}</span>
+        </span>
+      </button>`;
+    }).join("");
+
+    const st = grandState(g);
+    const pivots = THEORIES.filter((t) => g.set && g.set[t.id] && g.set[t.id] !== t.options[0].id);
+    $("#grandDetail").innerHTML = `
+      <div class="panel grand-info">
+        <div class="grand-head">${SP.img(g.sprite, 64)}<div><h2 class="h2" style="margin:0 0 6px">${esc(g.name)}</h2><span class="tag t-${g.tag}">${g.tag}</span> <span class="muted">${esc(g.since)}</span></div></div>
+        <p>${esc(g.summary)}</p>
+        <h3 class="mg-h3">WHAT MAKES IT DIFFERENT</h3>
+        <ul class="grand-diffs">${g.differences.map((d) => `<li>${esc(d)}</li>`).join("")}</ul>
+        ${pivots.length ? `<h3 class="mg-h3">ITS KEY CALLS <span class="muted" style="font-family:var(--font-body);font-size:16px;letter-spacing:0">(where it breaks from the mainstream)</span></h3>
+          <div class="chips" style="margin:0 0 12px">${pivots.map((t) => `<button class="chip" data-goto-theory="${t.id}" title="${esc(t.title)}">${esc(t.short)}: ${esc(optLabel(t.id, st[t.id]))}</button>`).join("")}</div>` : `<p class="muted">This is the baseline: every other grand theory is measured against it.</p>`}
+        <div class="row">
+          <button class="btn btn-sm" data-grand-load="${g.id}">LOAD INTO MY CANON</button>
+          <span class="grand-pct" style="align-self:center">YOUR CANON: ${grandMatch(g)}% MATCH</span>
+        </div>
+      </div>
+      <div class="panel grand-tl">
+        <h3 class="mg-h3">THE CONDENSED TIMELINE</h3>
+        ${g.sections.map((sec, i) => `<details class="grand-sec" ${i < 2 ? "open" : ""}>
+          <summary><span class="grand-sec-n">${String(i + 1).padStart(2, "0")}</span> ${esc(sec.name)} <span class="muted">· ${sec.beats.length}</span></summary>
+          <ol class="grand-beats">${sec.beats.map(([y, t]) => `<li><span class="grand-y">${esc(y)}</span><span>${esc(t)}</span></li>`).join("")}</ol>
+        </details>`).join("")}
+        <div class="row" style="margin-top:10px"><button class="btn btn-sm" data-grand-expand>EXPAND ALL</button></div>
+      </div>`;
+
+    // comparison table
+    const base = grandState(GRAND[0]);
+    $("#grandCmp").innerHTML = `<thead><tr><th scope="col">QUESTION</th>${GRAND.map((x) => `<th scope="col" class="${x.id === g.id ? "sel" : ""}"><button data-grand="${x.id}">${SP.img(x.sprite, 24)}<span>${esc(x.name)}</span></button></th>`).join("")}<th scope="col" class="you">YOU</th></tr></thead>
+      <tbody>${GRAND_COMPARE.filter((tid) => TH[tid]).map((tid) => `<tr>
+        <th scope="row"><button data-goto-theory="${tid}">${esc(TH[tid].short)}</button></th>
+        ${GRAND.map((x) => { const v = grandState(x)[tid]; const cls = [x.id === g.id ? "sel" : "", v !== base[tid] ? "diff" : "", v === S[tid] ? "mine" : ""].join(" "); return `<td class="${cls}">${esc(optLabel(tid, v))}</td>`; }).join("")}
+        <td class="you">${esc(optLabel(tid, S[tid]))}</td>
+      </tr>`).join("")}</tbody>`;
+  }
+  ["#grandPick", "#grandCmp"].forEach((sel) => $(sel) && $(sel).addEventListener("click", (e) => {
+    const b = e.target.closest("[data-grand]");
+    if (!b) return;
+    grandId = b.dataset.grand;
+    blip(520);
+    renderGrand();
+    if (sel === "#grandCmp") $("#grandDetail").scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
+  }));
+  $("#grandDetail") && $("#grandDetail").addEventListener("click", (e) => {
+    const ld = e.target.closest("[data-grand-load]");
+    if (ld) {
+      const g = GRAND.find((x) => x.id === ld.dataset.grandLoad);
+      applyChanges(() => { S = grandState(g); }, `LOADED: ${g.name.toUpperCase()}`);
+      return;
+    }
+    if (e.target.closest("[data-grand-expand]")) {
+      const secs = $$(".grand-sec", $("#grandDetail"));
+      const allOpen = secs.every((d) => d.open);
+      secs.forEach((d) => { d.open = !allOpen; });
+      e.target.textContent = allOpen ? "EXPAND ALL" : "COLLAPSE ALL";
+    }
+  });
+
   // ---------------- tabs ----------------
-  const TABS = ["timeline", "minigames", "theories", "characters", "web", "archive"];
+  const TABS = ["timeline", "grand", "minigames", "theories", "characters", "web", "archive"];
   function showTab(name, fromHash) {
     if (!TABS.includes(name)) name = "timeline";
     TABS.forEach((t) => {
@@ -669,6 +753,7 @@
     renderTheories();
     renderChars();
     renderMgLore();
+    renderGrand();
     if (!$("#tab-web").hidden) renderWeb();
     if (!$("#tab-archive").hidden) renderArchive();
     if (dossierId) {

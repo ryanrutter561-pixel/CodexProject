@@ -602,3 +602,70 @@ button.chip-tape:hover { background: var(--green); color: #000 !important; }
   .mg-cab { font-size: 7px; }
   .mg-cap { font-size: 18px; }
 }
+
+/* =========================================================
+   GRAND THEORIES
+   ========================================================= */
+.grand-pick { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); gap: 10px; margin-bottom: 16px; }
+.grand-card {
+  display: flex; gap: 10px; align-items: center; text-align: left; cursor: pointer;
+  background: var(--panel); color: var(--ink); border: 3px solid var(--line); padding: 10px;
+  clip-path: var(--notch); font-family: var(--font-body);
+}
+.grand-card:hover { border-color: var(--purple); }
+.grand-card:hover img { animation: bob .4s steps(2) infinite; }
+.grand-card[aria-current="true"] { border-color: var(--gold); background: #231c06; }
+.grand-card img { width: 48px; height: 48px; flex-shrink: 0; }
+.grand-card-body { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-width: 0; width: 100%; }
+.grand-card-name { font-family: var(--font-px); font-size: 10px; line-height: 1.5; color: #fff; }
+.grand-meter { display: block; width: 100%; height: 8px; background: var(--bg2); border: 2px solid var(--line); }
+.grand-meter span { display: block; height: 100%; background: repeating-linear-gradient(90deg, var(--green) 0 6px, #1f8a44 6px 8px); }
+.grand-pct { font-family: var(--font-px); font-size: 7px; color: var(--green); letter-spacing: 1px; }
+
+.grand-detail { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; margin-bottom: 16px; }
+.grand-head { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; }
+.grand-head img { width: 64px; height: 64px; }
+.grand-info p { margin: 0 0 12px; }
+.grand-diffs { margin: 0 0 12px; padding-left: 20px; }
+.grand-diffs li { margin-bottom: 6px; }
+.grand-diffs li::marker { content: "◆ "; color: var(--gold); font-size: .8em; }
+
+.grand-sec { border-left: 4px solid var(--purple-d); margin-bottom: 8px; background: var(--bg2); }
+.grand-sec[open] { border-left-color: var(--gold); }
+.grand-sec summary {
+  cursor: pointer; list-style: none; padding: 8px 10px;
+  font-family: var(--font-px); font-size: 10px; line-height: 1.6; color: #fff;
+}
+.grand-sec summary::-webkit-details-marker { display: none; }
+.grand-sec summary::before { content: "▶ "; color: var(--purple); }
+.grand-sec[open] summary::before { content: "▼ "; color: var(--gold); }
+.grand-sec summary .muted { font-family: var(--font-body); font-size: 17px; }
+.grand-sec-n { color: var(--cyan); }
+.grand-beats { list-style: none; margin: 0; padding: 0 10px 10px 10px; display: flex; flex-direction: column; gap: 6px; }
+.grand-beats li { display: grid; grid-template-columns: 112px 1fr; gap: 10px; border-top: 2px dotted var(--line); padding-top: 6px; }
+.grand-y { font-family: var(--font-px); font-size: 8px; color: var(--cyan); line-height: 1.6; padding-top: 3px; }
+
+.cmp-wrap { overflow-x: auto; }
+.cmp { border-collapse: collapse; width: 100%; min-width: 860px; font-size: 18px; }
+.cmp th, .cmp td { border: 2px solid var(--line); padding: 6px 8px; text-align: left; vertical-align: top; }
+.cmp thead th { font-family: var(--font-px); font-size: 8px; line-height: 1.5; color: var(--dim); background: var(--bg2); }
+.cmp thead th button, .cmp tbody th button {
+  all: unset; cursor: pointer; display: flex; gap: 6px; align-items: center;
+  font-family: var(--font-px); font-size: 8px; line-height: 1.5; color: var(--ink);
+}
+.cmp thead th button:hover, .cmp tbody th button:hover { color: var(--gold); }
+.cmp thead th img { width: 24px; height: 24px; flex-shrink: 0; }
+.cmp tbody th { background: var(--bg2); white-space: nowrap; }
+.cmp td.diff { color: var(--gold); }
+.cmp td.mine::after { content: " ✓"; color: var(--green); }
+.cmp .sel { background: #231c06; }
+.cmp .you { background: #0f2a18; color: var(--green); }
+.cmp-key.diff { color: var(--gold); }
+.cmp-key.mine { color: var(--green); }
+
+@media (max-width: 900px) {
+  .grand-detail { grid-template-columns: 1fr; }
+}
+@media (max-width: 520px) {
+  .grand-beats li { grid-template-columns: 1fr; gap: 2px; }
+}
