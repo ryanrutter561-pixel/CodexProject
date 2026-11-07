@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lore Tapes</title>
+  <meta name="description" content="An unofficial, interactive Five Nights at Freddy's lore timeline. Pick between competing fan theories and watch the story rewrite itself.">
+  <meta name="theme-color" content="#05040a">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' shape-rendering='crispEdges'%3E%3Crect width='8' height='8' fill='%2305040a'/%3E%3Crect x='1' y='1' width='2' height='2' fill='%237a35c8'/%3E%3Crect x='5' y='1' width='2' height='2' fill='%237a35c8'/%3E%3Crect x='1' y='2' width='6' height='5' fill='%237a35c8'/%3E%3Crect x='2' y='3' width='1' height='1' fill='%23fff'/%3E%3Crect x='5' y='3' width='1' height='1' fill='%23fff'/%3E%3Crect x='2' y='5' width='4' height='1' fill='%23fff'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- ======== BOOT / TITLE SCREEN ======== -->
+  <div id="boot" role="dialog" aria-label="Title screen">
+    <div class="boot-inner">
+      <pre class="boot-log" id="bootLog" aria-hidden="true"></pre>
+      <div class="boot-title" id="bootTitle">
+        <div class="boot-sprites" aria-hidden="true">
+          <span data-spr="freddy"></span><span data-spr="bonnie"></span><span data-spr="chica"></span><span data-spr="foxy"></span><span data-spr="puppet"></span>
+        </div>
+        <h1>LORE<br>TAPES</h1>
+        <p class="boot-sub">an interactive Five Nights at Freddy's theory timeline</p>
+        <button class="btn btn-start blink" id="startBtn">PRESS START</button>
+        <p class="boot-fine">Unofficial fan project · spoilers for the whole series</p>
+      </div>
+      <div class="boot-walk" aria-hidden="true"><span id="bootWalker"></span><span data-spr="cake" class="boot-cake"></span></div>
+    </div>
+  </div>
+
+  <!-- ======== HEADER ======== -->
+  <header class="top">
+    <a class="brand" href="#timeline" aria-label="Lore Tapes home">
+      <span data-spr="goldenfreddy" class="brand-spr"></span>
+      <span class="brand-text"><span class="brand-title">LORE TAPES</span><span class="brand-sub">Five Nights at Freddy's theory timeline · unofficial</span></span>
+    </a>
+    <div class="controls">
+      <label class="ctl">
+        <span>CANON PRESET</span>
+        <select id="preset">
+          <option value="">— custom —</option>
+        </select>
+      </label>
+      <button class="btn btn-sm" id="shareBtn" title="Copy a link to your version of the lore">SHARE</button>
+      <button class="btn btn-sm" id="soundBtn" aria-pressed="false" title="Toggle 8-bit sounds">SFX: OFF</button>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Sections">
+    <button role="tab" data-tab="timeline">TIMELINE</button>
+    <button role="tab" data-tab="theories">THEORIES</button>
+    <button role="tab" data-tab="characters">CHARACTERS</button>
+    <button role="tab" data-tab="web">CONNECTIONS</button>
+    <button role="tab" data-tab="archive">ARCHIVE</button>
+  </nav>
+
+  <main>
+    <!-- TIMELINE -->
+    <section class="tab" id="tab-timeline" role="tabpanel" aria-label="Timeline">
+      <div class="intro panel">
+        <p><b class="hl">HOW IT WORKS:</b> This is the story of the series, from Fredbear's Family Diner to the Mega Pizzaplex. Wherever fans disagree, you'll see a <span class="tag tag-contested">CONTESTED</span> box. Pick a theory and the timeline rewrites itself, along with characters, connections and dates.</p>
+      </div>
+      <div class="tl-tools">
+        <label class="ctl grow"><span>SEARCH</span><input id="tlSearch" type="search" placeholder="springlock, Cassidy, 1987…"></label>
+        <label class="ctl"><span>CHARACTER</span><select id="tlChar"><option value="">Everyone</option></select></label>
+        <label class="ctl check"><input type="checkbox" id="tlContested"> <span>CONTESTED ONLY</span></label>
+      </div>
+      <div class="tl-track" id="tlTrack" aria-hidden="true">
+        <div class="tl-clocks" id="tlClocks"></div>
+        <div class="tl-rail"><span class="tl-walker" id="tlWalker"></span></div>
+      </div>
+      <div id="timeline" class="timeline"></div>
+    </section>
+
+    <!-- THEORIES -->
+    <section class="tab" id="tab-theories" role="tabpanel" aria-label="Theories" hidden>
+      <div class="intro panel">
+        <p><b class="hl">THEORY BOARD:</b> Every open question in one place. Each option shows the case <span class="for">FOR</span> and <span class="against">AGAINST</span>, and the tag shows roughly how the community sees it, from <span class="tag t-CONFIRMED">CONFIRMED</span> to <span class="tag t-FRINGE">FRINGE</span>.</p>
+      </div>
+      <div class="chip-row" id="thCats"></div>
+      <div id="theories" class="theories"></div>
+    </section>
+
+    <!-- CHARACTERS -->
+    <section class="tab" id="tab-characters" role="tabpanel" aria-label="Characters" hidden>
+      <div class="intro panel"><p><b class="hl">DOSSIERS:</b> Select a character to open their file. Bios, aliases and forms all follow your chosen theories.</p></div>
+      <div id="chars" class="char-grid"></div>
+    </section>
+
+    <!-- WEB -->
+    <section class="tab" id="tab-web" role="tabpanel" aria-label="Connections" hidden>
+      <div class="intro panel"><p><b class="hl">CONNECTIONS:</b> Pick anyone to put them at the centre, and select a neighbour to follow the thread. <span class="legend"><i class="lg lg-fam"></i>family/ally <i class="lg lg-kill"></i>harm <i class="lg lg-theory"></i>depends on your theories</span></p></div>
+      <div class="web-wrap">
+        <div class="web-list" id="webList"></div>
+        <div class="web-stage panel" id="webStage"></div>
+      </div>
+      <div class="panel web-detail" id="webDetail"></div>
+    </section>
+
+    <!-- ARCHIVE -->
+    <section class="tab" id="tab-archive" role="tabpanel" aria-label="Archive" hidden>
+      <div class="archive-grid">
+        <div class="panel">
+          <h2 class="h2">YOUR CANON</h2>
+          <p class="muted">A plain-text summary of every choice you've made, ready to paste into an argument.</p>
+          <pre id="canonText" class="canon-text"></pre>
+          <div class="row">
+            <button class="btn btn-sm" id="copyCanon">COPY TEXT</button>
+            <button class="btn btn-sm" id="resetCanon">RESET TO MAINSTREAM</button>
+          </div>
+        </div>
+        <div class="panel">
+          <h2 class="h2">THE GAMES</h2>
+          <div id="gamesList" class="games-list"></div>
+        </div>
+        <div class="panel span2">
+          <h2 class="h2">GLOSSARY</h2>
+          <dl id="glossary" class="glossary"></dl>
+        </div>
+        <div class="panel span2">
+          <h2 class="h2">CONTINUITIES</h2>
+          <dl id="continuities" class="glossary"></dl>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>LORE TAPES is an unofficial fan project for discussion and fun. Five Nights at Freddy's and all related characters belong to their respective owners. All pixel sprites here are original drawings. Theory tags reflect common fan discussion, not official statements.</p>
+  </footer>
+
+  <dialog id="dossier" class="dossier" aria-label="Character dossier"></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <canvas id="static" class="static" width="160" height="90" aria-hidden="true"></canvas>
+
+  <script src="js/sprites.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
