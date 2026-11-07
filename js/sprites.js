@@ -305,6 +305,8 @@
     car:          { t: "car",    p: { B: "#7a35c8", D: "#2a0e52", W: "#9ad8ff", K: "#111", Y: "#ffd23a" }, o: [] },
     gift:         { t: "gift",   p: { B: "#3a8ad8", R: "#ff4fa8", D: "#1a3a6a" }, o: [] },
     princess:     { t: "human",  p: { H: "#f2d27a", S: SKIN, E: "#2a6ad8", M: "#c0506a", C: "#b58cff", Y: "#ffcc33" }, o: ["crown"] },
+    bonniebro:    { t: "human",  p: { H: "#5a5ad6", S: "#7a7ae6", E: "#111", M: "#e0306a", C: "#3a8a4a", A: "#5a5ad6" }, o: ["ears"] },
+    tapegirl:     { t: "human",  p: { H: "#6a3a1a", S: SKIN, E: "#111", M: "#c0506a", C: "#2a8a8a", Y: "#ffcc33" }, o: ["badge"] },
     cake:         { t: "cake",   p: { P: "#ff7ab8", W: "#fff", B: "#8a4b22", Y: "#ffcc33", O: "#ff8a1a" }, o: [] },
     phone:        { t: "phone",  p: { K: "#111", R: "#c8402a", W: "#f4f4f4" }, o: [] },
     tape:         { t: "tape",   p: { K: "#111", G: "#8a8a98", W: "#f4f4f4" }, o: [] },
