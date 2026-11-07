@@ -713,7 +713,8 @@
   });
 
   // ---------------- tabs ----------------
-  const TABS = ["timeline", "grand", "minigames", "theories", "characters", "web", "archive"];
+  // Read the tab list from the page itself, so the HTML and JS can never disagree
+  const TABS = $$(".tabs [data-tab]").map((b) => b.dataset.tab).filter((t) => document.getElementById(`tab-${t}`));
   function showTab(name, fromHash) {
     if (!TABS.includes(name)) name = "timeline";
     TABS.forEach((t) => {
