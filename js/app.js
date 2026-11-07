@@ -5,6 +5,8 @@
   "use strict";
   const { THEORIES, ERAS, EVENTS, CHARACTERS, EDGES, GAMES, GLOSSARY, CONTINUITIES, PRESETS } = window.LORE;
   const SP = window.SPRITES;
+  const MINIGAMES = window.LORE.MINIGAMES || [];
+  const MG = Object.fromEntries(MINIGAMES.map((m) => [m.id, m]));
 
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
@@ -174,6 +176,8 @@
   document.addEventListener("click", (e) => {
     const opt = e.target.closest("[data-tid][data-oid]");
     if (opt) { setChoice(opt.dataset.tid, opt.dataset.oid); return; }
+    const gm = e.target.closest("[data-goto-mg]");
+    if (gm) { closeDossier(); gotoMinigame(gm.dataset.gotoMg); return; }
     const gt = e.target.closest("[data-goto-theory]");
     if (gt) { closeDossier(); gotoTheory(gt.dataset.gotoTheory); return; }
     const ge = e.target.closest("[data-goto-event]");
@@ -217,7 +221,7 @@
           </div>
           <p class="ev-body">${e._body}</p>
           ${(e.theories || []).map(contestBox).join("")}
-          <div class="chips">${gameChips(e.games)}${(e.chars || []).filter((c) => CH[c]).slice(0, 6).map((c) => `<button class="chip" data-open-char="${c}">${esc(CH[c].name)}</button>`).join("")}</div>
+          <div class="chips">${(e.minigames || []).filter((m) => MG[m]).map((m) => `<button class="chip chip-tape" data-goto-mg="${m}">▶ REPLAY: ${esc(MG[m].title)}</button>`).join("")}${gameChips(e.games)}${(e.chars || []).filter((c) => CH[c]).slice(0, 6).map((c) => `<button class="chip" data-open-char="${c}">${esc(CH[c].name)}</button>`).join("")}</div>
         </div>
       </article>`;
     });
@@ -296,6 +300,7 @@
     $("#theories").innerHTML = list.map((t) => {
       const sel = t.options.find((o) => o.id === S[t.id]) || t.options[0];
       const { evs, chs } = affects(t.id);
+      const mgs = MINIGAMES.filter((m) => (m.theories || []).includes(t.id));
       return `<article class="panel th" id="th-${t.id}">
         <div class="th-top"><span class="th-cat">${t.cat}</span><span class="tag t-${sel.tag}">${sel.tag}</span></div>
         <h3 class="th-title">${esc(t.title)}</h3>
@@ -308,7 +313,7 @@
             <div class="con"><span class="against">AGAINST</span><ul>${sel.con.map((p) => `<li>${esc(p)}</li>`).join("")}</ul></div>
           </div>
         </div>
-        ${evs.length || chs.length ? `<div class="chips affects"><span class="chip" style="border:0;padding-left:0">AFFECTS:</span>${evs.map((e) => `<button class="chip" data-goto-event="${e.id}">⏱ ${esc(val(e.title))}</button>`).join("")}${chs.map((c) => `<button class="chip" data-open-char="${c.id}">☺ ${esc(c.name)}</button>`).join("")}</div>` : ""}
+        ${evs.length || chs.length || mgs.length ? `<div class="chips affects"><span class="chip" style="border:0;padding-left:0">AFFECTS:</span>${evs.map((e) => `<button class="chip" data-goto-event="${e.id}">⏱ ${esc(val(e.title))}</button>`).join("")}${chs.map((c) => `<button class="chip" data-open-char="${c.id}">☺ ${esc(c.name)}</button>`).join("")}${mgs.map((m) => `<button class="chip chip-tape" data-goto-mg="${m.id}">▶ ${esc(m.title)}</button>`).join("")}</div>` : ""}
       </article>`;
     }).join("");
   }
@@ -496,8 +501,135 @@
     if (soundOn) jingle();
   });
 
+  // ---------------- MINIGAMES (storyboard replays) ----------------
+  let mgId = MINIGAMES.length ? MINIGAMES[0].id : null;
+  let mgBeat = 0, mgAuto = false, mgTimer = null, mgType = null;
+  function mgStop() { mgAuto = false; clearTimeout(mgTimer); syncMgAuto(); }
+  function syncMgAuto() {
+    const b = $("#mgAuto");
+    if (b) { b.setAttribute("aria-pressed", String(mgAuto)); b.textContent = mgAuto ? "❚❚ PAUSE" : "AUTO ▶▶"; }
+  }
+  function renderMgGrid() {
+    const games = [...new Set(MINIGAMES.map((m) => m.game))];
+    $("#mgGrid").innerHTML = games.map((g) => `<div class="mg-group"><h3 class="mg-group-h">${esc(g)} <span class="muted">· ${esc(GAMES[g] ? GAMES[g].n : g)}</span></h3><div class="mg-row">${
+      MINIGAMES.filter((m) => m.game === g).map((m) => `<button class="mg-cab" data-mg="${m.id}" aria-current="${m.id === mgId}">${SP.img(m.icon, 40)}<span class="mg-cab-t">${esc(m.title)}</span></button>`).join("")
+    }</div></div>`).join("");
+  }
+  function renderMgLore() {
+    const m = MG[mgId];
+    if (!m || !$("#mgLore")) return;
+    $("#mgLore").innerHTML = `
+      <h2 class="h2">${esc(m.title)}</h2>
+      <div class="chips" style="margin:0 0 10px"><span class="chip">${esc(m.game)} · ${esc(GAMES[m.game] ? GAMES[m.game].n : m.game)}</span><span class="chip">${esc(m.when)}</span></div>
+      <h3 class="mg-h3">WHAT IT REVEALS</h3>
+      <p class="mg-lore">${m.lore(S)}</p>
+      ${(m.theories || []).length ? `<h3 class="mg-h3">CONTESTED</h3>${m.theories.map(contestBox).join("")}` : ""}
+      ${(m.events || []).length ? `<h3 class="mg-h3" style="margin-top:12px">ON THE TIMELINE</h3><div class="chips">${m.events.map((id) => EVENTS.find((e) => e.id === id)).filter(Boolean).map((e) => `<button class="chip" data-goto-event="${e.id}">⏱ ${esc(val(e.title))}</button>`).join("")}</div>` : ""}`;
+  }
+  function typeCaption(text) {
+    const el = $("#mgCap");
+    clearInterval(mgType);
+    if (reduced) { el.textContent = text; return; }
+    let i = 0;
+    el.textContent = "";
+    mgType = setInterval(() => {
+      i += 2;
+      el.textContent = text.slice(0, i);
+      if (i >= text.length) clearInterval(mgType);
+    }, 18);
+  }
+  function renderBeat(fresh) {
+    const m = MG[mgId];
+    if (!m) return;
+    const b = m.beats[mgBeat];
+    const scr = $("#mgScreen");
+    const layer = $("#mgActors");
+    if (fresh) layer.innerHTML = "";
+    scr.className = `mg-screen bg-${b.bg}${b.fx ? " fx-" + b.fx : ""}`;
+    const counts = {}, keep = new Set();
+    b.s.forEach(([id, x, y = 0, mods = ""]) => {
+      counts[id] = (counts[id] || 0) + 1;
+      const key = `${id}#${counts[id]}`;
+      keep.add(key);
+      let el = layer.querySelector(`[data-key="${key}"]`);
+      if (!el) {
+        el = document.createElement("div");
+        el.dataset.key = key;
+        el.innerHTML = SP.img(id, 64);
+        el.style.left = x + "%";
+        el.style.bottom = 12 + y + "%";
+        layer.appendChild(el);
+        mods += " enter";
+      }
+      el.className = `actor ${mods}`;
+      el.style.left = x + "%";
+      el.style.bottom = 12 + y + "%";
+    });
+    $$(".actor", layer).forEach((el) => { if (!keep.has(el.dataset.key)) layer.removeChild(el); });
+    $("#mgBanner").textContent = b.banner || "";
+    $("#mgBanner").hidden = !b.banner;
+    $("#mgCount").textContent = `${mgBeat + 1} / ${m.beats.length}`;
+    $("#mgMarquee").textContent = m.title.toUpperCase();
+    $("#mgPrev").disabled = mgBeat === 0;
+    $("#mgNext").textContent = mgBeat === m.beats.length - 1 ? "REPLAY ↺" : "NEXT ▶";
+    typeCaption(b.cap);
+    if (b.fx === "glitch") glitchSfx(); else blip(330 + mgBeat * 110, 0.07);
+    if (mgAuto) {
+      clearTimeout(mgTimer);
+      mgTimer = setTimeout(() => {
+        if (mgBeat < m.beats.length - 1) { mgBeat++; renderBeat(); } else mgStop();
+      }, 1800 + b.cap.length * 32);
+    }
+  }
+  function loadMinigame(id) {
+    if (!MG[id]) return;
+    mgId = id; mgBeat = 0;
+    clearTimeout(mgTimer);
+    renderMgGrid();
+    renderMgLore();
+    renderBeat(true);
+  }
+  function renderMinigames() {
+    if (!$("#mgGrid").children.length) renderMgGrid();
+    renderMgLore();
+    if (!$("#mgActors").children.length) renderBeat(true);
+  }
+  function gotoMinigame(id) {
+    showTab("minigames");
+    loadMinigame(id);
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }
+  $("#mgGrid").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-mg]");
+    if (!b) return;
+    mgStop();
+    loadMinigame(b.dataset.mg);
+    $("#mgCab").scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "center" });
+  });
+  $("#mgPrev").addEventListener("click", () => { mgStop(); if (mgBeat > 0) { mgBeat--; renderBeat(); } });
+  $("#mgNext").addEventListener("click", () => {
+    const m = MG[mgId];
+    if (mgBeat < m.beats.length - 1) { mgBeat++; renderBeat(); } else { mgBeat = 0; renderBeat(true); }
+  });
+  $("#mgAuto").addEventListener("click", () => {
+    mgAuto = !mgAuto;
+    syncMgAuto();
+    if (mgAuto) {
+      const m = MG[mgId];
+      if (mgBeat >= m.beats.length - 1) mgBeat = 0;
+      renderBeat(mgBeat === 0);
+    } else clearTimeout(mgTimer);
+  });
+  $("#mgScreen").addEventListener("click", () => $("#mgNext").click());
+  document.addEventListener("keydown", (e) => {
+    if ($("#tab-minigames").hidden || $("#dossier").open) return;
+    if (/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return;
+    if (e.key === "ArrowRight") { e.preventDefault(); $("#mgNext").click(); }
+    if (e.key === "ArrowLeft") { e.preventDefault(); $("#mgPrev").click(); }
+  });
+
   // ---------------- tabs ----------------
-  const TABS = ["timeline", "theories", "characters", "web", "archive"];
+  const TABS = ["timeline", "minigames", "theories", "characters", "web", "archive"];
   function showTab(name, fromHash) {
     if (!TABS.includes(name)) name = "timeline";
     TABS.forEach((t) => {
@@ -509,7 +641,9 @@
       try { history.replaceState(null, "", location.pathname + location.search + "#" + name); } catch (e) { /* ignore */ }
     }
     if (name === "web") renderWeb();
+    if (name === "minigames") renderMinigames();
     if (name === "archive") renderArchive();
+    if (name !== "minigames") mgStop();
     if (name === "timeline") requestAnimationFrame(updateWalker);
   }
   $(".tabs").addEventListener("click", (e) => {
@@ -534,6 +668,7 @@
     renderTimeline();
     renderTheories();
     renderChars();
+    renderMgLore();
     if (!$("#tab-web").hidden) renderWeb();
     if (!$("#tab-archive").hidden) renderArchive();
     if (dossierId) {

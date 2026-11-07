@@ -50,6 +50,7 @@
 
   <nav class="tabs" role="tablist" aria-label="Sections">
     <button role="tab" data-tab="timeline">TIMELINE</button>
+    <button role="tab" data-tab="minigames">MINIGAMES</button>
     <button role="tab" data-tab="theories">THEORIES</button>
     <button role="tab" data-tab="characters">CHARACTERS</button>
     <button role="tab" data-tab="web">CONNECTIONS</button>
@@ -72,6 +73,33 @@
         <div class="tl-rail"><span class="tl-walker" id="tlWalker"></span></div>
       </div>
       <div id="timeline" class="timeline"></div>
+    </section>
+
+    <!-- MINIGAMES -->
+    <section class="tab" id="tab-minigames" role="tabpanel" aria-label="Minigames" hidden>
+      <div class="intro panel">
+        <p><b class="hl">ARCADE:</b> The series hides its darkest secrets in tiny 8-bit minigames. Pick a cabinet to watch a beat-by-beat replay (original pixel art, not the real game), then read what it reveals. Use <b>NEXT</b>, the arrow keys, or <b>AUTO</b>.</p>
+      </div>
+      <div class="mg-wrap">
+        <div class="mg-cab-big" id="mgCab">
+          <div class="mg-marquee" id="mgMarquee">INSERT COIN</div>
+          <div class="mg-bezel">
+            <div class="mg-screen bg-dark" id="mgScreen" role="img" aria-label="Minigame replay screen">
+              <div class="mg-banner" id="mgBanner" hidden></div>
+              <div class="mg-actors" id="mgActors"></div>
+            </div>
+          </div>
+          <p class="mg-cap" id="mgCap" aria-live="polite"></p>
+          <div class="mg-ctrl">
+            <button class="btn btn-sm" id="mgPrev">◀ PREV</button>
+            <span class="mg-count" id="mgCount">1 / 1</span>
+            <button class="btn btn-sm" id="mgNext">NEXT ▶</button>
+            <button class="btn btn-sm" id="mgAuto" aria-pressed="false">AUTO ▶▶</button>
+          </div>
+        </div>
+        <div class="panel mg-lore-panel" id="mgLore"></div>
+      </div>
+      <div id="mgGrid" class="mg-grid"></div>
     </section>
 
     <!-- THEORIES -->
@@ -137,6 +165,7 @@
 
   <script src="js/sprites.js"></script>
   <script src="js/data.js"></script>
+  <script src="js/minigames.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

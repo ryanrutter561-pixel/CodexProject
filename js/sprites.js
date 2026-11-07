@@ -184,6 +184,60 @@
       "................",
       "................",
     ],
+    dog: [
+      "................",
+      "................",
+      "...DD...........",
+      "..DBBD..........",
+      "..DBBBBBD.......",
+      ".DBEBBBBBD....D.",
+      "KBBBBBBBBD...DB.",
+      "DDDDBBBBBBDDDBD.",
+      "....DBBBBBBBBBD.",
+      "....DBBBBBBBBBD.",
+      "....DBBBBBBBBD..",
+      "....DBDDDDDBBD..",
+      "....DBD...DBD...",
+      "....DBD...DBD...",
+      "....DDD...DDD...",
+      "................",
+    ],
+    car: [
+      "................",
+      "................",
+      "................",
+      "................",
+      ".....DDDDDD.....",
+      "....DBWWDWWD....",
+      "...DBBWWDWWBD...",
+      "..DBBBBBBBBBBDD.",
+      ".DBBBBBBBBBBBBBD",
+      ".DBBBBBBBBBBBBYD",
+      ".DDDKKDDDDDKKDDD",
+      "...KKKK...KKKK..",
+      "....KK.....KK...",
+      "................",
+      "................",
+      "................",
+    ],
+    gift: [
+      "................",
+      "................",
+      "......R..R......",
+      ".......RR.......",
+      "...BBBBRRBBBB...",
+      "...BBBBRRBBBB...",
+      "...RRRRRRRRRR...",
+      "...BBBBRRBBBB...",
+      "...BBBBRRBBBB...",
+      "...BBBBRRBBBB...",
+      "...BBBBRRBBBB...",
+      "...BBBBRRBBBB...",
+      "...DDDDDDDDDD...",
+      "................",
+      "................",
+      "................",
+    ],
     fire: [
       ".......R........",
       "......RR........",
@@ -241,6 +295,16 @@
     cassie:       { t: "human",  p: { H: "#2a1a10", S: "#c88a5a", E: "#111", M: "#9a4a4a", C: "#ff4fa8", A: "#ff9ccc" }, o: ["ears"] },
     edwin:        { t: "human",  p: { H: "#6a6a72", S: SKIN, E: "#111", M: "#9a4a4a", C: "#3a2a1a", R: "#7a5a2a" }, o: ["tie"] },
     oswald:       { t: "human",  p: { H: "#2a1a10", S: "#8a5a3a", E: "#111", M: "#5a2a2a", C: "#e2b23a" }, o: [] },
+    shadowfreddy: { t: "bear",   p: { B: "#3a1a6a", D: "#14062a", A: "#4e2a8a", W: "#14062a", E: "#fff", K: "#14062a" }, o: ["hat"] },
+    kid:          { t: "human",  p: { H: "#3a2414", S: SKIN, E: "#111", M: "#9a4a4a", C: "#3fb04a" }, o: [] },
+    kid2:         { t: "human",  p: { H: "#e8c84a", S: "#f6d2b0", E: "#111", M: "#9a4a4a", C: "#e0306a" }, o: [] },
+    kid3:         { t: "human",  p: { H: "#1a1010", S: "#a8704a", E: "#111", M: "#5a2a2a", C: "#3a6ad8" }, o: [] },
+    kidgrey:      { t: "human",  p: { H: "#5a5a66", S: "#9a9aa8", E: "#3a3a44", M: "#3a3a44", C: "#6a6a78", T: "#c8c8d8" }, o: ["tears"] },
+    susie:        { t: "human",  p: { H: "#5a3418", S: SKIN, E: "#111", M: "#c0506a", C: "#f3d23a" }, o: ["pigtails"] },
+    dog:          { t: "dog",    p: { B: "#c8a070", D: "#5a3a1a", E: "#111", K: "#111" }, o: [] },
+    car:          { t: "car",    p: { B: "#7a35c8", D: "#2a0e52", W: "#9ad8ff", K: "#111", Y: "#ffd23a" }, o: [] },
+    gift:         { t: "gift",   p: { B: "#3a8ad8", R: "#ff4fa8", D: "#1a3a6a" }, o: [] },
+    princess:     { t: "human",  p: { H: "#f2d27a", S: SKIN, E: "#2a6ad8", M: "#c0506a", C: "#b58cff", Y: "#ffcc33" }, o: ["crown"] },
     cake:         { t: "cake",   p: { P: "#ff7ab8", W: "#fff", B: "#8a4b22", Y: "#ffcc33", O: "#ff8a1a" }, o: [] },
     phone:        { t: "phone",  p: { K: "#111", R: "#c8402a", W: "#f4f4f4" }, o: [] },
     tape:         { t: "tape",   p: { K: "#111", G: "#8a8a98", W: "#f4f4f4" }, o: [] },
@@ -288,6 +352,7 @@
       [9, 13].forEach((r) => (g[r] = g[r].slice(1) + "."));
     },
     badge(g) { setPx(g, 12, 5, "Y"); },
+    crown(g) { [5, 7, 8, 10].forEach((c) => setPx(g, 0, c, "Y")); for (let c = 5; c <= 10; c++) setPx(g, 1, c, "Y"); },
     tie(g) { setPx(g, 11, 7, "R"); setPx(g, 11, 8, "R"); setPx(g, 12, 7, "R"); setPx(g, 12, 8, "R"); setPx(g, 13, 7, "R"); },
     pigtails(g) {
       [[3, 1], [4, 1], [4, 2], [5, 1], [6, 1], [3, 14], [4, 14], [4, 13], [5, 14], [6, 14]].forEach(([r, c]) => setPx(g, r, c, "H"));
@@ -316,6 +381,7 @@
     const d = DEF[id];
     if (!d) return null;
     const g = T[d.t].map((r) => (r + "................").slice(0, 16));
+    while (g.length < 16) g.push("................");
     let seed = 0;
     for (const ch of id) seed = (seed * 31 + ch.charCodeAt(0)) % 100000;
     (d.o || []).forEach((o) => OVERLAYS[o] && OVERLAYS[o](g, seed));

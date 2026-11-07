@@ -444,3 +444,161 @@ button.chip:hover { color: #fff; border-color: var(--purple); }
   *, *::before, *::after { animation: none !important; transition: none !important; }
   html { scroll-behavior: auto; }
 }
+
+/* =========================================================
+   MINIGAMES / ARCADE
+   ========================================================= */
+.chip-tape { color: var(--green) !important; border-color: #1f5a34 !important; }
+button.chip-tape:hover { background: var(--green); color: #000 !important; }
+
+.mg-wrap { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.mg-cab-big {
+  background: linear-gradient(#24124a, #120a26);
+  border: 4px solid var(--purple-d);
+  padding: 12px 14px 14px;
+  clip-path: var(--notch);
+}
+.mg-marquee {
+  font-family: var(--font-px); font-size: 12px; text-align: center; line-height: 1.5;
+  color: var(--gold); background: #000; border: 3px solid var(--gold);
+  padding: 8px; margin-bottom: 10px; text-shadow: 0 0 8px rgba(255, 204, 51, .6);
+}
+.mg-bezel { background: #000; padding: 10px; border: 3px solid #000; box-shadow: inset 0 0 0 3px #2c2552; }
+.mg-screen {
+  position: relative; aspect-ratio: 4 / 3; overflow: hidden; cursor: pointer;
+  image-rendering: pixelated;
+  box-shadow: inset 0 0 40px rgba(0,0,0,.85);
+}
+.mg-screen::after { /* screen scanlines */
+  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 4;
+  background: repeating-linear-gradient(to bottom, transparent 0 2px, rgba(0,0,0,.25) 2px 4px);
+}
+.mg-actors { position: absolute; inset: 0; z-index: 2; }
+.actor {
+  position: absolute; transform: translateX(-50%);
+  transition: left .7s steps(10), bottom .5s steps(6), opacity .4s;
+}
+.actor img { width: 68px; height: 68px; max-width: 12vw; max-height: 12vw; }
+.actor.flip img { transform: scaleX(-1); }
+.actor.down img { transform: rotate(90deg); }
+.actor.dim { opacity: .55; }
+.actor.ghost { opacity: .6; filter: grayscale(1) brightness(1.8); }
+.actor.big img { transform: scale(1.45); transform-origin: bottom center; }
+.actor.walk img { animation: bob .35s steps(2) infinite; }
+.actor.shake img { animation: shake .18s steps(2) infinite; }
+.actor.enter { animation: popin .35s steps(4); }
+@keyframes shake { 50% { translate: 3px 0; } }
+@keyframes popin { from { opacity: 0; } to { opacity: 1; } }
+.mg-banner {
+  position: absolute; top: 7%; left: 0; right: 0; z-index: 3; text-align: center;
+  font-family: var(--font-px); font-size: clamp(9px, 2.3vw, 16px); line-height: 1.6;
+  color: #fff; text-shadow: 3px 3px 0 #000; padding: 0 10px; letter-spacing: 1px;
+  animation: blink 1.2s steps(1) infinite;
+}
+.mg-cap {
+  min-height: 3.9em; margin: 10px 0; padding: 10px 12px;
+  background: #000; border: 3px solid #fff; color: #fff; font-size: 20px;
+}
+.mg-ctrl { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.mg-ctrl .btn:disabled { opacity: .4; cursor: default; }
+.mg-count { font-family: var(--font-px); font-size: 9px; color: var(--dim); min-width: 50px; text-align: center; }
+.mg-h3 { font-family: var(--font-px); font-size: 9px; color: var(--purple); margin: 0 0 6px; letter-spacing: 1px; }
+.mg-lore { margin: 0 0 12px; }
+.mg-grid { margin-top: 20px; display: flex; flex-direction: column; gap: 14px; }
+.mg-group-h { font-family: var(--font-px); font-size: 10px; color: var(--gold); margin: 0 0 8px; line-height: 1.6; }
+.mg-group-h .muted { font-family: var(--font-body); font-size: 18px; }
+.mg-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; }
+.mg-cab {
+  display: flex; align-items: center; gap: 10px; text-align: left;
+  background: var(--panel); color: var(--ink); border: 3px solid var(--line); padding: 8px 10px; cursor: pointer;
+  font-family: var(--font-px); font-size: 9px; line-height: 1.5;
+}
+.mg-cab img { width: 40px; height: 40px; flex-shrink: 0; }
+.mg-cab:hover { border-color: var(--purple); }
+.mg-cab[aria-current="true"] { border-color: var(--gold); background: #231c06; color: var(--gold); }
+
+/* scene backgrounds */
+.bg-dark { background: #050308; }
+.bg-room {
+  background:
+    linear-gradient(to bottom, #1d1238 0 70%, transparent 70%),
+    repeating-conic-gradient(#2c2c34 0 25%, #121216 0 50%) 0 0 / 28px 28px;
+}
+.bg-party {
+  background:
+    radial-gradient(circle at 12% 20%, #ff5fae 0 3px, transparent 4px),
+    radial-gradient(circle at 34% 12%, #3de0ff 0 3px, transparent 4px),
+    radial-gradient(circle at 62% 24%, #ffcc33 0 3px, transparent 4px),
+    radial-gradient(circle at 86% 14%, #3dff7a 0 3px, transparent 4px),
+    linear-gradient(to bottom, #3a1a5a 0 70%, transparent 70%),
+    repeating-conic-gradient(#e8e8f0 0 25%, #1a1a24 0 50%) 0 0 / 28px 28px;
+}
+.bg-night {
+  background:
+    radial-gradient(circle at 15% 15%, #fff 0 1px, transparent 2px),
+    radial-gradient(circle at 45% 25%, #fff 0 1px, transparent 2px),
+    radial-gradient(circle at 75% 10%, #fff 0 1px, transparent 2px),
+    radial-gradient(circle at 88% 32%, #fff 0 1px, transparent 2px),
+    linear-gradient(to bottom, #060a24 0 82%, #141428 82%);
+}
+.bg-rain { background: linear-gradient(to bottom, #0a0e22 0 82%, #18182a 82%); }
+.bg-rain::before {
+  content: ""; position: absolute; inset: -40px 0 0; z-index: 1; pointer-events: none;
+  background: repeating-linear-gradient(105deg, transparent 0 14px, rgba(140,170,255,.35) 14px 16px);
+  animation: rain .4s linear infinite;
+}
+@keyframes rain { to { transform: translateY(40px); } }
+.bg-road { background: linear-gradient(to bottom, #000 0 62%, #1a1a1a 62% 100%); }
+.bg-road::before {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 30%; height: 4px; z-index: 1;
+  background: repeating-linear-gradient(90deg, #ffd23a 0 24px, transparent 24px 48px);
+  animation: road .5s steps(6) infinite;
+}
+@keyframes road { to { background-position: -48px 0; } }
+.bg-house { background: linear-gradient(to bottom, #060a24 0 82%, #12241a 82%); }
+.bg-house::before {
+  content: ""; position: absolute; z-index: 1; right: 8%; bottom: 18%; width: 34%; height: 44%;
+  background:
+    linear-gradient(#ffd23a, #ffd23a) 30% 55% / 24% 22% no-repeat,
+    #3a2a4a;
+  clip-path: polygon(50% 0, 100% 34%, 100% 100%, 0 100%, 0 34%);
+}
+.bg-maze {
+  background:
+    repeating-linear-gradient(90deg, transparent 0 46px, #1f6a3a 46px 54px),
+    repeating-linear-gradient(0deg, transparent 0 46px, #1f6a3a 46px 54px),
+    #0b2a16;
+}
+.bg-castle {
+  background:
+    linear-gradient(to bottom, transparent 0 82%, #1a1622 82%),
+    repeating-linear-gradient(0deg, #2a2438 0 2px, transparent 2px 20px),
+    repeating-linear-gradient(90deg, #2a2438 0 2px, transparent 2px 40px),
+    #3a3448;
+}
+.bg-stage {
+  background:
+    linear-gradient(90deg, #8a1020 0 10%, transparent 10% 90%, #8a1020 90%),
+    linear-gradient(to bottom, #2a0a3a 0 70%, #5a3a1a 70%);
+}
+.bg-diner {
+  background:
+    linear-gradient(to bottom, transparent 0 70%, #6a4a1a 70%),
+    repeating-linear-gradient(90deg, #4a2a0a 0 30px, #5a3410 30px 60px);
+}
+.fx-glitch { animation: glitch .5s steps(2) 3; }
+@keyframes glitch {
+  0% { filter: hue-rotate(0); transform: translateX(0); }
+  25% { filter: hue-rotate(120deg) contrast(1.6); transform: translateX(-4px); }
+  50% { filter: invert(.15); transform: translateX(3px) skewX(2deg); }
+  75% { filter: hue-rotate(260deg); transform: translateX(-2px); }
+}
+
+@media (max-width: 900px) {
+  .mg-wrap { grid-template-columns: 1fr; }
+}
+@media (max-width: 520px) {
+  .mg-row { grid-template-columns: 1fr 1fr; }
+  .mg-cab { font-size: 7px; }
+  .mg-cap { font-size: 18px; }
+}
